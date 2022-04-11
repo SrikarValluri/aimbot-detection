@@ -8,6 +8,8 @@ import numpy as np
 import os
 import cv2
 
+
+
 class RNN(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, num_classes):
         super(RNN, self).__init__()
@@ -66,17 +68,17 @@ no_hacks_labels = torch.zeros(hacks_data.shape[0]).unsqueeze(1)
 
 
 # Seperating Training/Testing data
-hacks_data_train = hacks_data[:35]
-hacks_data_test = hacks_data[35:]
+hacks_data_train = hacks_data[:20]
+hacks_data_test = hacks_data[20:]
 
-no_hacks_data_train = no_hacks_data[:35]
-no_hacks_data_test = no_hacks_data[35:]
+no_hacks_data_train = no_hacks_data[:20]
+no_hacks_data_test = no_hacks_data[20:]
 
-hacks_labels_train = hacks_labels[:35]
-hacks_labels_test = hacks_labels[35:]
+hacks_labels_train = hacks_labels[:20]
+hacks_labels_test = hacks_labels[20:]
 
-no_hacks_labels_train = no_hacks_labels[:35]
-no_hacks_labels_test = no_hacks_labels[35:]
+no_hacks_labels_train = no_hacks_labels[:20]
+no_hacks_labels_test = no_hacks_labels[20:]
 
 
 train_data = torch.cat((hacks_data_train, no_hacks_data_train))
@@ -87,22 +89,6 @@ train_labels = torch.cat((hacks_labels_train, no_hacks_labels_train))
 print(train_data.shape)
 print(train_labels.shape)
 
-# NEED TO RANDOMIZE DATA STILL!!!!!
-
-# print(hacks_labels_train.shape)
-# print(no_hacks_labels_train.shape)
-
-# print(train_data.shape)
-# print(train_labels.shape)
-
-
-# s = np.arange(train_data.shape[0])
-# np.random.shuffle(s)
-
-# train_data = torch.from_numpy(train_data.detach().numpy()[s])
-# train_labels = torch.from_numpy(train_labels.detach().numpy()[s])
-
-
 test_data = torch.cat((hacks_data_test, no_hacks_data_test))
 test_labels = torch.cat((hacks_labels_test, no_hacks_labels_test))
 
@@ -111,6 +97,10 @@ for epoch in range(num_epochs):
     images = train_data
     labels = train_labels
     labels = labels.to(device)
+
+    random_shuffle = torch.randperm(images.size()[0])
+    images = images[random_shuffle]
+    labels = labels[random_shuffle]
     
     # Forward pass
     outputs = model(images)
@@ -122,6 +112,8 @@ for epoch in range(num_epochs):
     optimizer.step()
     
     print (f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
+    if(epoch > 75 and (0.15 < loss.item() < 0.22)):
+        break
 
 # Test the model
 # In test phase, we don't need to compute gradients (for memory efficiency)
@@ -130,6 +122,7 @@ model.eval()
 with torch.no_grad():
     n_correct = 0
     n_samples = 0
+
     for i in range(len(test_data)):
         curr_test = test_data[i].unsqueeze(0)
         curr_label = test_labels[i][0].item()
@@ -143,3 +136,7 @@ with torch.no_grad():
 
 print(n_samples)
 print("percentage correct: " + str(n_correct/n_samples * 100.))
+
+
+
+torch.save(model, "./models/model.pt")

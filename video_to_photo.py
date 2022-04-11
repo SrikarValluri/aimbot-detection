@@ -42,11 +42,11 @@ def get_frames(input_filename, output_directory, frameRate):
 
 
 if __name__ == "__main__":
-    directory = "./no_hacks_data/"
+    directory = "./hacks_data/"
     i = 0
     for file in os.listdir(directory):
         filename = os.fsdecode(file)
         if filename.endswith(".mp4"): 
             print(os.path.join(directory, filename))
-            get_frames(os.path.join(directory, filename), ("./no_hacks_data_nn/" + str(i) + "/"), 1/60)
+            get_frames(os.path.join(directory, filename), ("./hacks_data_nn/" + str(i) + "/"), 1/60)
             i += 1

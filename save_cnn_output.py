@@ -20,7 +20,7 @@ model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)
 model.eval()
 model.fc = nn.Identity()
 
-rootdir = "./hacks_data_nn/"
+rootdir = "./no_hacks_data_nn/"
 i = 0
 j = 0
 all_videos = []
@@ -41,7 +41,7 @@ for subdir, dirs, files in os.walk(rootdir):
     if(len(single_video) == 50):
         single_video = torch.stack(single_video)
         all_videos.append(single_video)
-        torch.save(torch.stack(all_videos), './hacks_data_tensor/hacks_data_tensor_file.pt')
+        torch.save(torch.stack(all_videos), './no_hacks_data_tensor/no_hacks_data_tensor_file.pt')
         j += 1
 
     print(j)
