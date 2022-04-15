@@ -15,18 +15,6 @@ kills = 0
 frames = 0
 l = collections.deque(maxlen=550)
 
-ap = argparse.ArgumentParser()
-ap.add_argument("-o", "--output", required=True,
-    help="path to output directory")
-ap.add_argument("-p", "--picamera", type=int, default=-1,
-    help="whether or not the Raspberry Pi camera should be used")
-ap.add_argument("-f", "--fps", type=int, default=60,
-    help="FPS of output video")
-ap.add_argument("-c", "--codec", type=str, default="MJPG",
-    help="codec of output video")
-ap.add_argument("-b", "--buffer-size", type=int, default=550,
-    help="buffer size of video clip writer")
-
 kcw = KeyClipWriter(bufSize=550)
 consecFrames = 0
 
