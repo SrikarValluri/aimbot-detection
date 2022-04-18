@@ -23,7 +23,9 @@ model.fc = nn.Identity()
 rootdir = "./no_hacks_data_nn/"
 i = 0
 j = 0
+dir_ct = 0
 all_videos = []
+saved_name = './no_hacks_data_tensor/no_hacks_data_tensor_file'
 for subdir, dirs, files in os.walk(rootdir):
     single_video = []
     for file in files:
@@ -41,12 +43,17 @@ for subdir, dirs, files in os.walk(rootdir):
     if(len(single_video) == 50):
         single_video = torch.stack(single_video)
         all_videos.append(single_video)
-        torch.save(torch.stack(all_videos), './no_hacks_data_tensor/no_hacks_data_tensor_file.pt')
+        torch.save(torch.stack(all_videos), (saved_name + str(dir_ct) + ".pt"))
         j += 1
 
     print(j)
-    if(j == 45):
-        break
+    if(j % 5 == 0 and j != 0):
+        all_videos.clear()
+        dir_ct += 5
+        print("saving_new")
+
+
+
 
 all_videos = torch.stack(all_videos)
 print(all_videos.shape)

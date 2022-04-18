@@ -53,10 +53,10 @@ num_layers = 2
 
 model = torch.load("./models/model.pt")
 
-hacks_data = torch.load("./hacks_data_tensor/hacks_data_tensor_file_old.pt")
+hacks_data = torch.load("./hacks_data_tensor/full_data/hacks_data_tensor_file_old.pt")
 hacks_labels = torch.ones(hacks_data.shape[0]).unsqueeze(1)
 
-no_hacks_data = torch.load("./no_hacks_data_tensor/no_hacks_data_tensor_file_old.pt")
+no_hacks_data = torch.load("./no_hacks_data_tensor/full_data/no_hacks_data_tensor_file_old.pt")
 no_hacks_labels = torch.zeros(hacks_data.shape[0]).unsqueeze(1)
 
 # Seperating Training/Testing data

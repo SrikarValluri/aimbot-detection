@@ -57,13 +57,13 @@ criterion = nn.BCELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)  
 
 # Loading the model
-hacks_data = torch.load("./hacks_data_tensor/hacks_data_tensor_file.pt")
+hacks_data = torch.load("./hacks_data_tensor/full_data/hacks_data_tensor_file.pt")
 hacks_labels = torch.ones(hacks_data.shape[0]).unsqueeze(1)
 
 print(hacks_data.shape)
 print(hacks_labels.shape)
 
-no_hacks_data = torch.load("./no_hacks_data_tensor/no_hacks_data_tensor_file.pt")
+no_hacks_data = torch.load("./no_hacks_data_tensor/full_data/no_hacks_data_tensor_file.pt")
 no_hacks_labels = torch.zeros(hacks_data.shape[0]).unsqueeze(1)
 
 
@@ -114,29 +114,5 @@ for epoch in range(num_epochs):
     print (f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
     if(epoch > 75 and (0.15 < loss.item() < 0.22)):
         break
-
-# Test the model
-# In test phase, we don't need to compute gradients (for memory efficiency)
-
-model.eval()
-with torch.no_grad():
-    n_correct = 0
-    n_samples = 0
-
-    for i in range(len(test_data)):
-        curr_test = test_data[i].unsqueeze(0)
-        curr_label = test_labels[i][0].item()
-        outputs = model(curr_test)
-
-        if(abs(outputs.item()-curr_label) < 0.5):
-            print("success")
-            n_correct += 1
-
-        n_samples += 1
-
-print(n_samples)
-print("percentage correct: " + str(n_correct/n_samples * 100.))
-
-
 
 torch.save(model, "./models/model.pt")
