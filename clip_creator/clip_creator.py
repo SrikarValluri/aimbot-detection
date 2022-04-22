@@ -66,7 +66,6 @@ while(1):
 
     # 1.22% is the threshold for each kill, rounded to make sure it counts properly
     curr_kills = round(percentage / 1.22)
-    print(percentage)
 
     #if it detects another kill
     if(curr_kills > prev_kills):
