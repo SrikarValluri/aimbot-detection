@@ -1,6 +1,7 @@
 import argparse
 import collections
 import datetime
+import math
 import pathlib
 import cv2
 import numpy as np
@@ -10,12 +11,23 @@ import datetime
 import time
 import cv2
 
-cap = cv2.VideoCapture("cheatarms1.mp4")
+#Uses code from:
+#https://pyimagesearch.com/2016/02/29/saving-key-event-video-clips-with-opencv/
+#
+
+cap = cv2.VideoCapture("no_cheats3.mkv")
 kills = 0
 frames = 0
+prev_kills = 0
+curr_kills = 0
+nored = 1
+prev_nored = 1
+yes_red = 0
+flux = 0
+
 l = collections.deque(maxlen=550)
 
-kcw = KeyClipWriter(bufSize=550)
+kcw = KeyClipWriter(bufSize=70)
 consecFrames = 0
 
 result = cv2.VideoWriter('filename.avi', 
@@ -27,15 +39,15 @@ while(1):
 
     updateConsecFrames = False
     
-    lower_red = np.array([30,200,50])
+    lower_red = np.array([100,200,100])
     upper_red = np.array([255,255,180])
 
     
-    sky = frame[70:110, 1600:1920]
+    sky = frame[70:500, 1907:1909]
     
     mask = cv2.inRange(hsv, lower_red, upper_red)
     res = cv2.bitwise_and(frame,frame, mask= mask)
-    sky2 = mask[70:110, 1600:1920]
+    sky2 = mask[70:500, 1907:1909]
 
     other = cv2.bitwise_and(sky, sky, mask= sky2)
 
@@ -48,28 +60,50 @@ while(1):
     tot_pixel = sky.size
     red_pixel = np.count_nonzero(sky2)
     percentage = round(red_pixel * 100 / tot_pixel, 2)
-    if(percentage > 2 and percentage < 4):
-        if(frames == 0):
-            updateConsecFrames = True
-            kills = kills + 1
-            frames = frames + 1
-            print("Kills : %i", kills)
-            print("Kill detected\n")
+
+    curr_kills = round(percentage / 1.22)
+    print(percentage)
+    if(curr_kills > prev_kills):
+        if(yes_red > 10):
+            prev_kills = curr_kills
+            yes_red = 0
+        #record
             if not kcw.recording:
+                print("Kills : ", curr_kills)
                 timestamp = datetime.datetime.now()
+            
                 p = "{}/{}.avi".format(pathlib.Path(__file__).parent.resolve(),
-                    timestamp.strftime("%Y%m%d-%H%M%S"))
+                timestamp.strftime("%Y%m%d-%H%M%S"))
                 kcw.start(p, cv2.VideoWriter_fourcc(*"MJPG"),
                     60)
-
         else:
-            updateConsecFrames = True
+            yes_red = yes_red + 1   
 
-            frames = frames + 1
-            if kcw.recording:
-                kcw.finish()
-            if(frames > 550):
-                frames = 0
+        
+        if(nored == 60):
+            prev_nored = 0
+            nored = 0
+        else:
+            prev_nored = nored
+            nored = nored + 1
+
+    elif(curr_kills < prev_kills):
+        if(flux > 10):
+            print("Kills : ", curr_kills)
+            prev_kills = curr_kills
+            flux = 0
+        else:
+            flux = flux + 1
+       
+
+    if kcw.recording:
+        kcw.finish()
+
+
+
+        
+
+
     if updateConsecFrames:
         consecFrames += 1
     # update the key frame clip buffer
