@@ -14,7 +14,7 @@ import cv2
 #Uses code from:
 #https://pyimagesearch.com/2016/02/29/saving-key-event-video-clips-with-opencv/
 #
-
+#Video file name
 cap = cv2.VideoCapture("no_cheats3.mkv")
 kills = 0
 frames = 0
@@ -27,6 +27,7 @@ flux = 0
 
 l = collections.deque(maxlen=550)
 
+#number of frames recorded, set to 60 for an even 1 second
 kcw = KeyClipWriter(bufSize=70)
 consecFrames = 0
 
@@ -59,15 +60,21 @@ while(1):
     l.append(frame)
     tot_pixel = sky.size
     red_pixel = np.count_nonzero(sky2)
+
+    #checks the % of red on the screen to determine the number of kills
     percentage = round(red_pixel * 100 / tot_pixel, 2)
 
+    # 1.22% is the threshold for each kill, rounded to make sure it counts properly
     curr_kills = round(percentage / 1.22)
     print(percentage)
+
+    #if it detects another kill
     if(curr_kills > prev_kills):
+        #make sure the "kill" is on screen for 10 frames
         if(yes_red > 10):
             prev_kills = curr_kills
             yes_red = 0
-        #record
+            #record since the kill is a kill
             if not kcw.recording:
                 print("Kills : ", curr_kills)
                 timestamp = datetime.datetime.now()
@@ -76,10 +83,11 @@ while(1):
                 timestamp.strftime("%Y%m%d-%H%M%S"))
                 kcw.start(p, cv2.VideoWriter_fourcc(*"MJPG"),
                     60)
+        #count to 10 frames
         else:
             yes_red = yes_red + 1   
 
-        
+        #old code, will remove
         if(nored == 60):
             prev_nored = 0
             nored = 0
@@ -87,15 +95,18 @@ while(1):
             prev_nored = nored
             nored = nored + 1
 
+    #if kills go down
     elif(curr_kills < prev_kills):
+        #frame count to 10 to make sure the kill has completely disappeared from the screen
         if(flux > 10):
             print("Kills : ", curr_kills)
             prev_kills = curr_kills
             flux = 0
         else:
+            #count to 10
             flux = flux + 1
        
-
+    #end the recording
     if kcw.recording:
         kcw.finish()
 
