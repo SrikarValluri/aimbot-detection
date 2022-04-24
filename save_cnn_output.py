@@ -52,9 +52,6 @@ for subdir, dirs, files in os.walk(rootdir):
         dir_ct += 5
         print("saving_new")
 
-
-
-
 all_videos = torch.stack(all_videos)
 print(all_videos.shape)
 
