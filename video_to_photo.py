@@ -41,7 +41,7 @@ def get_frames(input_filename, output_directory, frameRate):
         success = save_frame(count, sec, vid_cap, output_directory)
 
 
-def save_frames(file_name, out_dir):
+def save_frames(file_name, out_dir, start=0, end=-1):
     cap = cv2.VideoCapture(file_name)
 
     assert cap, "path to file must be valid"
@@ -52,14 +52,20 @@ def save_frames(file_name, out_dir):
     except OSError:
         logging.error('Error creating directory')
 
-    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    for fno in range(total_frames):
+
+    if end == -1:
+        end = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+    for fno in range(start, end):
         cap.set(cv2.CAP_PROP_POS_FRAMES, fno)
         success, frame = cap.read()
         assert success, "frame not read correctly"
 
         name = os.path.join(os.getcwd(), out_dir, "frame" + str(fno + 1) + ".png")
         cv2.imwrite(name, frame)
+
+    
+    cap.release()
 
 
 	
