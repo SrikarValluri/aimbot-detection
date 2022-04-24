@@ -99,15 +99,15 @@ while (cap.isOpened()):
 
 
 	# Display the resulting frame
-    cv2.imshow('Frame', frame)
+    # cv2.imshow('Frame', frame)
 
-    cv2.imshow('View', view)
+    # cv2.imshow('View', view)
 
 
 
 	# define q as the exit button
-    if cv2.waitKey(2) & 0xFF == ord('q'):
-        break
+    # if cv2.waitKey(2) & 0xFF == ord('q'):
+    #     break
 
 
     fc += 1
@@ -125,6 +125,10 @@ cv2.destroyAllWindows()
 print(pois)
 print(len(pois))
 
+#
+# Temp to assert not too many clips recorded
+#
+assert len(pois) < 33
 
 # how to save a frame modified from video_to_photos
 def save_frames(file_name, out_dir, start=0, end=-1):
@@ -139,8 +143,9 @@ def save_frames(file_name, out_dir, start=0, end=-1):
     if end == -1:
         end = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
+    cap.set(cv2.CAP_PROP_POS_FRAMES, start)
+
     for fno in range(start, end):
-        cap.set(cv2.CAP_PROP_POS_FRAMES, fno)
         success, frame = cap.read()
         assert success, "frame not read correctly"
 
@@ -167,5 +172,5 @@ for folder in subfolders:
 for x in range(len(pois)):
     assert pois[x] >= 55
 
-    save_frames(sys.argv[1], f'./hacks_data_nn/{max + x + 1}/', pois[x] - 55, pois[x] + 4)
+    save_frames(sys.argv[1], f'./hacks_data_nn/{max + x + 1}/', pois[x] - 55, pois[x] + 5)
 
