@@ -14,12 +14,25 @@ decCount = 0
 pois = []
 
 
-assert len(sys.argv) == 2, "needs file input"
+assert len(sys.argv) == 3, "needs file input and destination"
 
-print(sys.argv[1])
+inFile = sys.argv[1]
+outDir = sys.argv[2]
+
+#inure outDir ends with /
+outDir = outDir + ("/" if outDir[-1] != "/" else "")
+
+assert os.path.isfile(inFile), "input file doesn't exist"
+assert os.path.isdir(outDir), "output directory doesn't exist"
+
+print(f'Input File: {inFile}')
+print(f'Output Dir: {outDir}')
+print("")
+
+
 
 # Creating a VideoCapture object to read the video
-cap = cv2.VideoCapture(sys.argv[1])
+cap = cv2.VideoCapture(inFile)
 
 
 
@@ -83,7 +96,7 @@ while (cap.isOpened()):
 
     nlines = countLines(frame)
 
-    print(f'{nlines}\r', end='', flush=True)
+    print(f'Kills on Screen: {nlines}, Kills Counted: {len(pois)}\t\t\r', end='', flush=True)
 
 
     decCount += 1
@@ -92,22 +105,22 @@ while (cap.isOpened()):
         decCount = 0
 
     if nlines > plines and decCount > 10:
-        print("Increase")
+        # print("Increase")
         pois.append(fc)
 
     plines = nlines
 
 
 	# Display the resulting frame
-    # cv2.imshow('Frame', frame)
+    cv2.imshow('Frame', frame)
 
-    # cv2.imshow('View', view)
+    cv2.imshow('View', view)
 
 
 
 	# define q as the exit button
-    # if cv2.waitKey(2) & 0xFF == ord('q'):
-    #     break
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
 
     fc += 1
@@ -122,8 +135,9 @@ cv2.destroyAllWindows()
 
 
 # prints for refrence
+print("\n")
 print(pois)
-print(len(pois))
+print(f'\n----------\nSaving {len(pois)} Clip{"s" if len(pois) != 1 else ""}')
 
 #
 # Temp to assert not too many clips recorded
@@ -159,7 +173,7 @@ def save_frames(file_name, out_dir, start=0, end=-1):
 
 
 # find number of folder to save in
-subfolders = [ f.name for f in os.scandir('./hacks_data_nn/') if f.is_dir() ]
+subfolders = [ f.name for f in os.scandir(outDir) if f.is_dir() ]
 max = 0
 
 for folder in subfolders:
@@ -172,5 +186,9 @@ for folder in subfolders:
 for x in range(len(pois)):
     assert pois[x] >= 55
 
-    save_frames(sys.argv[1], f'./hacks_data_nn/{max + x + 1}/', pois[x] - 55, pois[x] + 5)
+    print(f'Saving Clip {x + 1}\t\r', end='', flush=True)
+
+    save_frames(inFile, f'{outDir}{max + x + 1}/', pois[x] - 55, pois[x] + 5)
+
+print("All Clips Saved!\t\t\t\t")
 
