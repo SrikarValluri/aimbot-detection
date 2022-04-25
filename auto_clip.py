@@ -142,7 +142,7 @@ print(f'\n----------\nSaving {len(pois)} Clip{"s" if len(pois) != 1 else ""}')
 #
 # Temp to assert not too many clips recorded
 #
-assert len(pois) < 33
+# assert len(pois) < 33
 
 # how to save a frame modified from video_to_photos
 def save_frames(file_name, out_dir, start=0, end=-1):

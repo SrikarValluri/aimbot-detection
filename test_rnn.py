@@ -53,32 +53,34 @@ num_layers = 2
 
 model = torch.load("./models/model.pt")
 
-hacks_data = torch.load("./hacks_data_tensor/full_data/hacks_data_tensor_file_old.pt")
+hacks_data = torch.load("./hacks_data_tensor/full_data/hacks_data_tensor_file.pt")
 hacks_labels = torch.ones(hacks_data.shape[0]).unsqueeze(1)
 
-no_hacks_data = torch.load("./no_hacks_data_tensor/full_data/no_hacks_data_tensor_file_old.pt")
-no_hacks_labels = torch.zeros(hacks_data.shape[0]).unsqueeze(1)
+no_hacks_data = torch.load("./no_hacks_data_tensor/full_data/no_hacks_data_tensor_file.pt")
+no_hacks_labels = torch.zeros(no_hacks_data.shape[0]).unsqueeze(1)
 
 # Seperating Training/Testing data
-hacks_data_train = hacks_data[:20]
-hacks_data_test = hacks_data[20:]
+# hacks_data_train = hacks_data[:150]
+hacks_data_test = hacks_data[150:]
 
-no_hacks_data_train = no_hacks_data[:20]
-no_hacks_data_test = no_hacks_data[20:]
+# no_hacks_data_train = no_hacks_data[:150]
+no_hacks_data_test = no_hacks_data[150:]
 
-hacks_labels_train = hacks_labels[:20]
-hacks_labels_test = hacks_labels[20:]
+# hacks_labels_train = hacks_labels[:150]
+hacks_labels_test = hacks_labels[150:]
 
-no_hacks_labels_train = no_hacks_labels[:20]
-no_hacks_labels_test = no_hacks_labels[20:]
+# no_hacks_labels_train = no_hacks_labels[:150]
+no_hacks_labels_test = no_hacks_labels[150:]
 
 
-train_data = torch.cat((hacks_data_train, no_hacks_data_train))
-train_labels = torch.cat((hacks_labels_train, no_hacks_labels_train))
+# train_data = torch.cat((hacks_data_train, no_hacks_data_train))
+# train_labels = torch.cat((hacks_labels_train, no_hacks_labels_train))
 
 test_data = torch.cat((hacks_data_test, no_hacks_data_test))
 test_labels = torch.cat((hacks_labels_test, no_hacks_labels_test))
 
+
+print(len(test_labels))
 model.eval()
 with torch.no_grad():
     n_correct = 0

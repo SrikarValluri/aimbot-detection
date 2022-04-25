@@ -31,6 +31,7 @@ for subdir, dirs, files in os.walk(rootdir):
     for file in files:
         # print(os.path.join(subdir, file))
         image = cv2.imread(os.path.join(subdir, file))
+        # print(image)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         transform = transforms.ToTensor()
         tensor = transform(image)
@@ -40,7 +41,7 @@ for subdir, dirs, files in os.walk(rootdir):
         single_video.append(frame_features.squeeze())
         i += 1
 
-    if(len(single_video) == 50):
+    if(len(single_video) == 60):
         single_video = torch.stack(single_video)
         all_videos.append(single_video)
         torch.save(torch.stack(all_videos), (saved_name + str(dir_ct) + ".pt"))
