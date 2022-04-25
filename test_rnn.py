@@ -51,7 +51,7 @@ num_layers = 2
 
 # model = RNN(input_size, hidden_size, num_layers, num_classes).to(device)
 
-model = torch.load("./models/model.pt")
+model = torch.load("./models/model_INCREDIBLE.pt")
 
 hacks_data = torch.load("./hacks_data_tensor/full_data/hacks_data_tensor_file_100.pt")
 hacks_labels = torch.ones(hacks_data.shape[0]).unsqueeze(1)
