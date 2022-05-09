@@ -54,10 +54,10 @@ num_layers = 2
 model = torch.load("./models/model_max_data.pt")
 
 # Loading the model
-hacks_data = torch.load("./hacks_data_tensor/full_data/hacks_data_tensor_file.pt")
+hacks_data = torch.load("./hacks_data_tensor/full_data/hacks_data_tensor_file_large.pt")
 hacks_labels = torch.ones(hacks_data.shape[0]).unsqueeze(1)
 
-no_hacks_data = torch.load("./no_hacks_data_tensor/full_data/no_hacks_data_tensor_file.pt")
+no_hacks_data = torch.load("./no_hacks_data_tensor/full_data/no_hacks_data_tensor_file_large.pt")
 no_hacks_labels = torch.zeros(no_hacks_data.shape[0]).unsqueeze(1)
 
 hacks_data_train = hacks_data[:int(len(hacks_data) * 0.9)]
