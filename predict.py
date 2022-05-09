@@ -16,6 +16,7 @@ delDir = True
 if len(sys.argv) > 2:
     dir = sys.argv[2]
     assert os.path.isdir(dir), f'{dir} isn\'t a valid dirctory'
+    assert len(os.listdir(dir)) == 0, "flder must be empty"
     delDir = False
 
 if delDir:
@@ -26,11 +27,14 @@ if delDir:
 print(f'python auto_clip.py \'{inFile}\' \'{dir}\' 1')
 subprocess.run(['python', './auto_clip.py', inFile, dir, '1'])
 
-times = [ (f.name).replace("_", ":") for f in os.scandir(dir) if f.is_dir() ]
-
 print('\n\n\n\n\nNow extracting features')
 
 subprocess.run(['python', 'save_cnn_output.py', dir, dir])
 
+
+print('\n\n\n\n\nNow Predicting value of cheats')
+
+
+subprocess.run(['python', 'test_rnn.py', os.path.join(dir, 'clips.pt'), dir])
 
 

@@ -1,3 +1,4 @@
+import sys
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -7,6 +8,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import cv2
+
+assert len(sys.argv) >= 2, "File requires input path"
+
+inFile = sys.argv[1]
+assert os.path.isfile(inFile), "not a valid file"
+
+inDir = False
+
+if len(sys.argv) > 2:
+    inDir = sys.argv[2]
+    assert os.path.isdir(inDir), "not a valid directory"
 
 
 
@@ -39,62 +51,23 @@ class RNN(nn.Module):
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-num_classes = 1
-num_epochs = 100
-
-learning_rate = 0.001
-
-input_size = 512
-sequence_length = 50
-hidden_size = 512
-num_layers = 2
-
-# model = RNN(input_size, hidden_size, num_layers, num_classes).to(device)
-
 model = torch.load("./models/model_max_data.pt")
 
-# Loading the model
-hacks_data = torch.load("./hacks_data_tensor/full_data/hacks_data_tensor_file_large.pt")
-hacks_labels = torch.ones(hacks_data.shape[0]).unsqueeze(1)
+data = torch.load(inFile)
 
-no_hacks_data = torch.load("./no_hacks_data_tensor/full_data/no_hacks_data_tensor_file_large.pt")
-no_hacks_labels = torch.zeros(no_hacks_data.shape[0]).unsqueeze(1)
+times = []
 
-hacks_data_train = hacks_data[:int(len(hacks_data) * 0.9)]
-hacks_data_test = hacks_data[int(len(hacks_data) * 0.9):]
-
-no_hacks_data_train = no_hacks_data[:int(len(no_hacks_data) * 0.9)]
-no_hacks_data_test = no_hacks_data[int(len(no_hacks_data) * 0.9):]
-
-hacks_labels_train = hacks_labels[:int(len(hacks_labels) * 0.9)]
-hacks_labels_test = hacks_labels[int(len(hacks_labels) * 0.9):]
-
-no_hacks_labels_train = no_hacks_labels[:int(len(no_hacks_labels) * 0.9)]
-no_hacks_labels_test = no_hacks_labels[int(len(no_hacks_labels) * 0.9):]
-
-
-# train_data = torch.cat((hacks_data_train, no_hacks_data_train))
-# train_labels = torch.cat((hacks_labels_train, no_hacks_labels_train))
-
-test_data = torch.cat((hacks_data_test, no_hacks_data_test))
-test_labels = torch.cat((hacks_labels_test, no_hacks_labels_test))
+if inDir:
+    times = [ (f.name).replace("_", ":") for f in os.scandir(inDir) if f.is_dir() ]
+    assert len(times) == data.shape[0], "number of clips doesnt match feature data"
 
 
 model.eval()
 with torch.no_grad():
-    n_correct = 0
-    n_samples = 0
 
-    for i in range(len(test_data)):
-        curr_test = test_data[i].unsqueeze(0)
-        curr_label = test_labels[i][0].item()
-        outputs = model(curr_test)
+    for i in range(len(data)):
+        curr_test = data[i].unsqueeze(0)
+        output = model(curr_test)
+        output = output.item()
 
-        if(abs(outputs.item()-curr_label) < 0.5):
-            print("success" + str(outputs.item()))
-            n_correct += 1
-
-        n_samples += 1
-
-print(n_samples)
-print("percentage correct: " + str(n_correct/n_samples * 100.))
+        print(f'Clip at {times[i]}: {"Regular Gameplay Detected" if output < 0.5 else "Aimbot Detected"}')
