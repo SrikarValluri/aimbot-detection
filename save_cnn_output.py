@@ -7,52 +7,60 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import cv2
+import sys
+
+if(len(sys.argv) != 3):
+    framesDir = "./hacks_data_nn"
+    outputDir = "./hacks_data_tensor/no_hacks_data_tensor_file"
+    
+
+else:
+    framesDir = sys.argv[1]
+    outputDir = sys.argv[2]
+
+if(not os.path.exists(framesDir)):
+    print("Frames directory is invalid.")
+    sys.exit()
 
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-# Hyper-parameters 
-num_epochs = 5
-batch_size = 4
-learning_rate = 0.001
 
 model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)
 model.eval()
 model.fc = nn.Identity()
 
-rootdir = "./no_hacks_data_nn/"
 i = 0
 j = 0
-dir_ct = 0
-all_videos = []
-saved_name = './no_hacks_data_tensor/no_hacks_data_tensor_file'
-for subdir, dirs, files in os.walk(rootdir):
-    single_video = []
+dirCt = 0
+allVideos = []
+
+# rootdir = "./AA_On_nn"
+# savedName = './no_hacks_data_tensor/no_hacks_data_tensor_file'
+# savedName = './AA_On_tensor/AA_On_tensor_file'
+for subdir, dirs, files in os.walk(framesDir):
+    singleVideo = []
     for file in files:
-        # print(os.path.join(subdir, file))
         image = cv2.imread(os.path.join(subdir, file))
-        # print(image)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         transform = transforms.ToTensor()
         tensor = transform(image)
         tensor = tensor.unsqueeze(0)  
-        frame_features = model(tensor)
-        # print(frame_features.shape)
-        single_video.append(frame_features.squeeze())
+        frameFeatures = model(tensor)
+        singleVideo.append(frameFeatures.squeeze())
         i += 1
 
-    if(len(single_video) == 60):
-        single_video = torch.stack(single_video)
-        all_videos.append(single_video)
-        torch.save(torch.stack(all_videos), (saved_name + str(dir_ct) + ".pt"))
+    if(len(singleVideo) == 60):
+        singleVideo = torch.stack(singleVideo)
+        allVideos.append(singleVideo)
+        torch.save(torch.stack(allVideos), (outputDir + str(dirCt) + ".pt"))
         j += 1
 
     print(j)
     if(j % 5 == 0 and j != 0):
-        all_videos.clear()
-        dir_ct += 5
+        allVideos.clear()
+        dirCt += 5
         print("saving_new")
 
-all_videos = torch.stack(all_videos)
-print(all_videos.shape)
+allVideos = torch.stack(allVideos)
+print(allVideos.shape)
 

@@ -7,17 +7,28 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import cv2
+import sys
 
 
-directory = "./no_hacks_data_tensor/"
+if(len(sys.argv) != 2):
+    inputDir = "./hacks_data_tensor/"
+    # directory = "./AA_On_tensor/"
+else:
+    inputDir = sys.argv[1]
 
-new_tensors = []
-for file in os.listdir(directory):
+if(not os.path.exists(inputDir)):
+    print("Input directory is invalid.")
+
+# (from bradley's code) inure outDir ends with /
+inputDir = inputDir + ("/" if inputDir[-1] != "/" else "")
+
+newTensors = []
+for file in os.listdir(inputDir):
      filename = os.fsdecode(file)
      if filename.endswith(".pt"):
-        new_tensors.append(torch.load(directory+str(filename)))
+        newTensors.append(torch.load(inputDir+str(filename)))
     
 
-full_tensor = torch.cat(new_tensors)
-print(full_tensor.shape)
-torch.save(full_tensor, directory + "full_data/no_hacks_data_tensor_file.pt")
+fullTensor = torch.cat(newTensors)
+print(fullTensor.shape)
+torch.save(fullTensor, inputDir + "full_data/" + inputDir[:-1] + "_file.pt")

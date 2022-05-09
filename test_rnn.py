@@ -51,26 +51,26 @@ num_layers = 2
 
 # model = RNN(input_size, hidden_size, num_layers, num_classes).to(device)
 
-model = torch.load("./models/model_INCREDIBLE.pt")
+model = torch.load("./models/model_max_data.pt")
 
-hacks_data = torch.load("./hacks_data_tensor/full_data/hacks_data_tensor_file_100.pt")
+# Loading the model
+hacks_data = torch.load("./hacks_data_tensor/full_data/hacks_data_tensor_file.pt")
 hacks_labels = torch.ones(hacks_data.shape[0]).unsqueeze(1)
 
-no_hacks_data = torch.load("./no_hacks_data_tensor/full_data/no_hacks_data_tensor_file_100.pt")
+no_hacks_data = torch.load("./no_hacks_data_tensor/full_data/no_hacks_data_tensor_file.pt")
 no_hacks_labels = torch.zeros(no_hacks_data.shape[0]).unsqueeze(1)
 
-# Seperating Training/Testing data
-# hacks_data_train = hacks_data[:150]
-hacks_data_test = hacks_data[150:]
+hacks_data_train = hacks_data[:int(len(hacks_data) * 0.9)]
+hacks_data_test = hacks_data[int(len(hacks_data) * 0.9):]
 
-# no_hacks_data_train = no_hacks_data[:150]
-no_hacks_data_test = no_hacks_data[150:]
+no_hacks_data_train = no_hacks_data[:int(len(no_hacks_data) * 0.9)]
+no_hacks_data_test = no_hacks_data[int(len(no_hacks_data) * 0.9):]
 
-# hacks_labels_train = hacks_labels[:150]
-hacks_labels_test = hacks_labels[150:]
+hacks_labels_train = hacks_labels[:int(len(hacks_labels) * 0.9)]
+hacks_labels_test = hacks_labels[int(len(hacks_labels) * 0.9):]
 
-# no_hacks_labels_train = no_hacks_labels[:150]
-no_hacks_labels_test = no_hacks_labels[150:]
+no_hacks_labels_train = no_hacks_labels[:int(len(no_hacks_labels) * 0.9)]
+no_hacks_labels_test = no_hacks_labels[int(len(no_hacks_labels) * 0.9):]
 
 
 # train_data = torch.cat((hacks_data_train, no_hacks_data_train))
@@ -80,7 +80,6 @@ test_data = torch.cat((hacks_data_test, no_hacks_data_test))
 test_labels = torch.cat((hacks_labels_test, no_hacks_labels_test))
 
 
-print(len(test_labels))
 model.eval()
 with torch.no_grad():
     n_correct = 0
@@ -92,7 +91,7 @@ with torch.no_grad():
         outputs = model(curr_test)
 
         if(abs(outputs.item()-curr_label) < 0.5):
-            print("success")
+            print("success" + str(outputs.item()))
             n_correct += 1
 
         n_samples += 1

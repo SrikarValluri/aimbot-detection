@@ -57,37 +57,30 @@ criterion = nn.BCELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)  
 
 # Loading the model
-hacks_data = torch.load("./hacks_data_tensor/full_data/hacks_data_tensor_file_100.pt")
+hacks_data = torch.load("./hacks_data_tensor/full_data/hacks_data_tensor_file.pt")
 hacks_labels = torch.ones(hacks_data.shape[0]).unsqueeze(1)
 
-print(hacks_data.shape)
-print(hacks_labels.shape)
-
-no_hacks_data = torch.load("./no_hacks_data_tensor/full_data/no_hacks_data_tensor_file_100.pt")
+no_hacks_data = torch.load("./no_hacks_data_tensor/full_data/no_hacks_data_tensor_file.pt")
 no_hacks_labels = torch.zeros(no_hacks_data.shape[0]).unsqueeze(1)
 
 
 # Seperating Training/Testing data
-hacks_data_train = hacks_data[:150]
-hacks_data_test = hacks_data[150:]
+hacks_data_train = hacks_data[:int(len(hacks_data) * 0.9)]
+hacks_data_test = hacks_data[int(len(hacks_data) * 0.9):]
 
-no_hacks_data_train = no_hacks_data[:150]
-no_hacks_data_test = no_hacks_data[150:]
+no_hacks_data_train = no_hacks_data[:int(len(no_hacks_data) * 0.9)]
+no_hacks_data_test = no_hacks_data[int(len(no_hacks_data) * 0.9):]
 
-hacks_labels_train = hacks_labels[:150]
-hacks_labels_test = hacks_labels[150:]
+hacks_labels_train = hacks_labels[:int(len(hacks_labels) * 0.9)]
+hacks_labels_test = hacks_labels[int(len(hacks_labels) * 0.9):]
 
-no_hacks_labels_train = no_hacks_labels[:150]
-no_hacks_labels_test = no_hacks_labels[150:]
+no_hacks_labels_train = no_hacks_labels[:int(len(no_hacks_labels) * 0.9)]
+no_hacks_labels_test = no_hacks_labels[int(len(no_hacks_labels) * 0.9):]
 
 
 train_data = torch.cat((hacks_data_train, no_hacks_data_train))
 train_labels = torch.cat((hacks_labels_train, no_hacks_labels_train))
 
-
-
-print(train_data.shape)
-print(train_labels.shape)
 
 test_data = torch.cat((hacks_data_test, no_hacks_data_test))
 test_labels = torch.cat((hacks_labels_test, no_hacks_labels_test))
@@ -112,7 +105,5 @@ for epoch in range(num_epochs):
     optimizer.step()
     
     print (f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
-    # if(epoch > 75 and (0.15 < loss.item() < 0.22)):
-    #     break
 
     torch.save(model, "./models/model.pt")
