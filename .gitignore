@@ -3,3 +3,4 @@
 *.mkv
 no_hacks_data_tensor_file_large.pt
 hacks_data_tensor_file_large.pt
+temp*/*

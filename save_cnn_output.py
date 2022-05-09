@@ -29,38 +29,32 @@ model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)
 model.eval()
 model.fc = nn.Identity()
 
-i = 0
-j = 0
-dirCt = 0
 allVideos = []
 
-# rootdir = "./AA_On_nn"
-# savedName = './no_hacks_data_tensor/no_hacks_data_tensor_file'
-# savedName = './AA_On_tensor/AA_On_tensor_file'
-for subdir, dirs, files in os.walk(framesDir):
-    singleVideo = []
-    for file in files:
-        image = cv2.imread(os.path.join(subdir, file))
+subfolders = [ f for f in os.scandir(framesDir) if f.is_dir() ]
+
+for folder in subfolders:
+    print(f'Etracting Features from clip at {(folder.name).replace("_", ":")}\t\t\t\r', end='', flush=True)
+
+    frames = [ f.path for f in os.scandir(folder.path) if f.is_file() ]
+    assert len(frames) == 60, f'{folder.name} has an incorrect number of frames ({len(frames)})'
+
+    video = []
+
+    for frame in frames:
+        image = cv2.imread(frame)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         transform = transforms.ToTensor()
         tensor = transform(image)
         tensor = tensor.unsqueeze(0)  
         frameFeatures = model(tensor)
-        singleVideo.append(frameFeatures.squeeze())
-        i += 1
+        video.append(frameFeatures.squeeze())
 
-    if(len(singleVideo) == 60):
-        singleVideo = torch.stack(singleVideo)
-        allVideos.append(singleVideo)
-        torch.save(torch.stack(allVideos), (outputDir + str(dirCt) + ".pt"))
-        j += 1
+    video = torch.stack(video)
+    allVideos.append(video)
 
-    print(j)
-    if(j % 5 == 0 and j != 0):
-        allVideos.clear()
-        dirCt += 5
-        print("saving_new")
-
+print("\nSaving Features")
 allVideos = torch.stack(allVideos)
 print(allVideos.shape)
-
+torch.save(allVideos, os.path.join(outputDir, "clips.pt"))
+print("Features Saved!")

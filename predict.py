@@ -26,7 +26,11 @@ if delDir:
 print(f'python auto_clip.py \'{inFile}\' \'{dir}\' 1')
 subprocess.run(['python', './auto_clip.py', inFile, dir, '1'])
 
+times = [ (f.name).replace("_", ":") for f in os.scandir(dir) if f.is_dir() ]
+
 print('\n\n\n\n\nNow extracting features')
+
+subprocess.run(['python', 'save_cnn_output.py', dir, dir])
 
 
 
