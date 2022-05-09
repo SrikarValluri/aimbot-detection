@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import sys
 import os
+import datetime
 
 # global vars
 fc = 0
@@ -14,16 +15,19 @@ decCount = 0
 pois = []
 
 
-assert len(sys.argv) == 3, "needs file input and destination"
+assert len(sys.argv) >= 3, "needs file input and destination"
 
 inFile = sys.argv[1]
 outDir = sys.argv[2]
 
-#inure outDir ends with /
-outDir = outDir + ("/" if outDir[-1] != "/" else "")
+print(outDir)
 
-assert os.path.isfile(inFile), "input file doesn't exist"
+assert os.path.isfile(inFile), f'input file {inFile} doesn\'t exist'
 assert os.path.isdir(outDir), "output directory doesn't exist"
+
+useTime = False
+if len(sys.argv) > 3 and sys.argv[3].isnumeric() and int(sys.argv[3]) > 0:
+    useTime = True
 
 print(f'Input File: {inFile}')
 print(f'Output Dir: {outDir}')
@@ -188,7 +192,13 @@ for x in range(len(pois)):
 
     print(f'Saving Clip {x + 1}\t\r', end='', flush=True)
 
-    save_frames(inFile, f'{outDir}{max + x + 1}/', pois[x] - 55, pois[x] + 5)
+    if useTime:
+        s = pois[x] / 60
+        time = datetime.timedelta(seconds = s)
+        # print(time)
+        save_frames(inFile, os.path.join(outDir, str(time).replace(":", "_")), pois[x] - 55, pois[x] + 5)
+    else:
+        save_frames(inFile, os.path.join(outDir , str(max + x + 1)), pois[x] - 55, pois[x] + 5)
 
 print("All Clips Saved!\t\t\t\t")
 
