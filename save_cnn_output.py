@@ -8,6 +8,7 @@ import numpy as np
 import os
 import cv2
 import sys
+import re
 
 if(len(sys.argv) != 3):
     framesDir = "./hacks_data_nn"
@@ -33,25 +34,29 @@ allVideos = []
 
 subfolders = [ f for f in os.scandir(framesDir) if f.is_dir() ]
 
-for folder in subfolders:
-    print(f'Etracting Features from clip at {(folder.name).replace("_", ":")}\t\t\t\r', end='', flush=True)
+with torch.no_grad():
+    for folder in subfolders:
+        print(f'Etracting Features from clip at {(folder.name).replace("_", ":")}\t\t\t\n', end='', flush=True)
 
-    frames = [ f.path for f in os.scandir(folder.path) if f.is_file() ]
-    assert len(frames) == 60, f'{folder.name} has an incorrect number of frames ({len(frames)})'
+        frames = [ int(re.findall(r'\d+', f.name)[0]) for f in os.scandir(folder.path) if f.is_file() ]
 
-    video = []
+        assert len(frames) == 60, f'{folder.name} has an incorrect number of frames ({len(frames)})'
 
-    for frame in frames:
-        image = cv2.imread(frame)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        transform = transforms.ToTensor()
-        tensor = transform(image)
-        tensor = tensor.unsqueeze(0)  
-        frameFeatures = model(tensor)
-        video.append(frameFeatures.squeeze())
+        frames.sort()
 
-    video = torch.stack(video)
-    allVideos.append(video)
+        video = []
+
+        for frame in frames:
+            image = cv2.imread(os.path.join(folder.path, f'frame{frame}.png'))
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            transform = transforms.ToTensor()
+            tensor = transform(image)
+            tensor = tensor.unsqueeze(0)  
+            frameFeatures = model(tensor)
+            video.append(frameFeatures.squeeze())
+
+        video = torch.stack(video)
+        allVideos.append(video)
 
 print("\nSaving Features")
 allVideos = torch.stack(allVideos)
