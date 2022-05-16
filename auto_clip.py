@@ -1,3 +1,13 @@
+"""
+auto_clip.py
+Usage: python auto_clip.py {Input Folder} {Output Directory} {(Optional) Use Time (0 or 1)}
+
+Takes in an input video file and finds kills based on killfeet
+
+Video file must be 1920 x 1080 @ 60FPS
+Video should contin gameplay of Counter Strike: Global Offensive
+"""
+
 import cv2
 import numpy as np
 import sys
@@ -14,17 +24,17 @@ decCount = 0
 
 pois = []
 
-
+#  Require 2 options to running program
 assert len(sys.argv) >= 3, "needs file input and destination"
 
 inFile = sys.argv[1]
 outDir = sys.argv[2]
 
-print(outDir)
-
+# Require input file and output directory exist
 assert os.path.isfile(inFile), f'input file {inFile} doesn\'t exist'
 assert os.path.isdir(outDir), "output directory doesn't exist"
 
+# allow optional flag to save clips in folders named after the time they ocour in the video
 useTime = False
 if len(sys.argv) > 3 and sys.argv[3].isnumeric() and int(sys.argv[3]) > 0:
     useTime = True
@@ -39,7 +49,8 @@ print("")
 cap = cv2.VideoCapture(inFile)
 
 
-
+# count the number of red lines found in a portion of an image
+# input image must be 3 pixles wide and in BGR format
 def countLines(im):
     assert im.shape[1] == 3
 
@@ -47,28 +58,34 @@ def countLines(im):
     breakS = 0
     lineC = 0
 
-    for x in range(im.shape[0]):
+    # for each horizontal line
+    for y in range(im.shape[0]):
+        # if 2 pixels in a row are incorrect
         if breakS >= 2:
             breakS = 0
+
+            # increment line count if there were enough pixles in a row
             if streak > 15:
                 lineC += 1
             streak = 0
 
-
-        if abs(int(im[x,1,2]) - int(im[x,0,2])) < 20:
+        # check if pixel to left is the same color
+        # Used to check for deaths because the are a solid color and not an outlined box
+        if abs(int(im[y,1,2]) - int(im[y,0,2])) < 20:
             breakS += 1
             continue
 
-
-        if im[x,1,2] > 150 and im[x,1,1] < 10 and im[x,1,0] < 50:
+        # check if the pixel is roughly the correct color of red
+        if im[y,1,2] > 150 and im[y,1,1] < 10 and im[y,1,0] < 50:
             streak += 1
             breakS = 0
 
+        # if wrong color cont count towards streak
         else:
             breakS += 1
 
 
-    
+    # Add a line to the count if the loop ends saying there is a streak
     if breakS > 15:
         lineC += 1
 
@@ -86,28 +103,31 @@ while (cap.isOpened()):
     if frame is None:
         break
 
-    # frame = cv2.resize(frame, (540, 380), fx = 0, fy = 0,
-	# 					interpolation = cv2.INTER_CUBIC)
 
     # shown to user
-    view = frame[70:300, 1800:1919]
-    # area of video to look analyze
+    view = frame.copy()
+    # view = cv2.resize(view, (1280, 720), fx = 0, fy = 0, interpolation = cv2.INTER_CUBIC)
+
+    # area of video to analyze must be 3 pixels wide
+    # this area is the right edge of the kill feed
     frame = frame[70:300, 1907:1910]
 
 
-
-    # print(nlines)
-
+    # count the number of kill feed edges
     nlines = countLines(frame)
 
+    # Display kills to user
     print(f'Kills on Screen: {nlines}, Kills Counted: {len(pois)}\t\t\r', end='', flush=True)
 
 
     decCount += 1
 
+    # check curent number of lines vs previous frames number of lines
     if nlines < plines:
+        # keep track of the last time the number of edges decreased
         decCount = 0
 
+    # if number of lines has increased add frame number to list to save later
     if nlines > plines and decCount > 10:
         # print("Increase")
         pois.append(fc)
@@ -115,9 +135,8 @@ while (cap.isOpened()):
     plines = nlines
 
 
-	# Display the resulting frame
+	# Display the frames to user
     cv2.imshow('Frame', frame)
-
     cv2.imshow('View', view)
 
 
@@ -128,8 +147,7 @@ while (cap.isOpened()):
 
 
     fc += 1
-
-
+    
 
 
 # release the video capture object
@@ -143,12 +161,10 @@ print("\n")
 print(pois)
 print(f'\n----------\nSaving {len(pois)} Clip{"s" if len(pois) != 1 else ""}')
 
-#
-# Temp to assert not too many clips recorded
-#
-# assert len(pois) < 33
+
 
 # how to save a frame modified from video_to_photos
+# only works with 1920x1080 video
 def save_frames(file_name, out_dir, start=0, end=-1):
     cap = cv2.VideoCapture(file_name)
 
@@ -176,29 +192,36 @@ def save_frames(file_name, out_dir, start=0, end=-1):
     cap.release()
 
 
-# find number of folder to save in
+# get folder names in outdir
 subfolders = [ f.name for f in os.scandir(outDir) if f.is_dir() ]
 max = 0
 
-for folder in subfolders:
-    if folder.isnumeric() and int(folder) > max:
-        max = int(folder)
+if not useTime:
+    # make new folder name larger than any folder in curent directory
+    for folder in subfolders:
+        if folder.isnumeric() and int(folder) > max:
+            max = int(folder) + 1
 
 
 
-# save all pois
+# save all clips found earlier
 for x in range(len(pois)):
     assert pois[x] >= 55
 
     print(f'Saving Clip {x + 1}\t\r', end='', flush=True)
 
+    # save folder based on time clip is in respective video
+    # using this name scheme may result in duplicate folder names across multiple different videos
+    # useful for saving info to tell to user
     if useTime:
         s = pois[x] / 60
         time = datetime.timedelta(seconds = s)
         # print(time)
         save_frames(inFile, os.path.join(outDir, str(time).replace(":", "_")), pois[x] - 55, pois[x] + 5)
+
+    # save folder name based on other folders in dir
     else:
-        save_frames(inFile, os.path.join(outDir , str(max + x + 1)), pois[x] - 55, pois[x] + 5)
+        save_frames(inFile, os.path.join(outDir , str(max + x)), pois[x] - 55, pois[x] + 5)
 
 print("All Clips Saved!\t\t\t\t")
 
