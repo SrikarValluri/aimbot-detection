@@ -10,14 +10,15 @@ import cv2
 
 
 
+# Defining LSTM RNN
 class RNN(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, num_classes):
-        super(RNN, self).__init__()
-        self.num_layers = num_layers
-        self.hidden_size = hidden_size
+        super(RNN, self).__init__()     # inheriting from existing RNN class
+        self.num_layers = num_layers    # number of input layers
+        self.hidden_size = hidden_size  # number of hidden players
 
-        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
-        self.fc = nn.Linear(hidden_size, num_classes)
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)  # creating LSTM layer
+        self.fc = nn.Linear(hidden_size, num_classes)                               # creating linear output layer
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -35,7 +36,7 @@ class RNN(nn.Module):
         out = self.fc(out)
 
 
-        return torch.sigmoid(out)
+        return torch.sigmoid(out) # returning one forward step of the NN
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -81,7 +82,9 @@ test_labels = torch.cat((hacks_labels_test, no_hacks_labels_test))
 
 print(test_data.shape)
 
-model.eval()
+model.eval() # Model is set to evaluate
+
+# Checking for whether clips are accurately predicted or not
 with torch.no_grad():
     n_correct = 0
     n_samples = 0

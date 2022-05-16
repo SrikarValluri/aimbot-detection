@@ -22,14 +22,15 @@ if len(sys.argv) > 2:
 
 
 
+# Defining LSTM RNN
 class RNN(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, num_classes):
-        super(RNN, self).__init__()
-        self.num_layers = num_layers
-        self.hidden_size = hidden_size
+        super(RNN, self).__init__()     # inheriting from existing RNN class
+        self.num_layers = num_layers    # number of input layers
+        self.hidden_size = hidden_size  # number of hidden players
 
-        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
-        self.fc = nn.Linear(hidden_size, num_classes)
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)  # creating LSTM layer
+        self.fc = nn.Linear(hidden_size, num_classes)                               # creating linear output layer
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -47,7 +48,7 @@ class RNN(nn.Module):
         out = self.fc(out)
 
 
-        return torch.sigmoid(out)
+        return torch.sigmoid(out) # returning one forward step of the NN
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
