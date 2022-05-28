@@ -1,7 +1,4 @@
-## Required software and hardware:
-
-The Python packages required include CV2, Pytorch, Matplotlib and Numpy.
-### Installs needed:
+## Required Software Packages:
 - python (3.9 +) 
 - OpenCV:
 Installed with: `pip install opencv-python`
@@ -12,13 +9,12 @@ Installed with: `pip3 install torch torchvision torchaudio --extra-index-url htt
 Or if you don't have access to an Nvidia GPU: `pip3 install torch torchvision torchaudio`
 
 
-## Steps to run:
+## Finding and predicting clips in a video:
 
-Record a video of CS:GO gameplay involving some kills from the player. Note that the video must be 1080p and run at 60fps. 
+Record a video of CS:GO gameplay involving some kills from the player. 
+**Note that the video must be 1080p and run at 60fps.**
 
-Run the following line without the <>
-`python predict.py <path to the video you want to analyze>`
-
+Predict by running: `python predict.py <video>` where *<video>* contains the path to the video you want to make predictions on
 
 While running, the program will display a window that shows the gameplay that is currently being analyzed along with the number of clips recorded so far. An additional window shows approximately what the parser is looking at. The program will run until either the video is finished, or the user presses ‘q’. Once finished, the clips will automatically be saved to a new folder.
 
@@ -29,3 +25,6 @@ The clips are automatically sent to the CNN for extraction. Once the features ha
 https://github.com/SrikarValluri/aimbot-detection
 
 ## Unrealized features:
+- Cheat detection for multiple games and different cheats
+- Website for easy access and use
+
