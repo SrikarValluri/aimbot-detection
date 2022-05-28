@@ -17,7 +17,6 @@ Or if you don't have access to an Nvidia GPU: `pip3 install torch torchvision to
 Record a video of CS:GO gameplay involving some kills from the player. Note that the video must be 1080p and run at 60fps. 
 
 Run the following line without the <>
-
 `python predict.py <path to the video you want to analyze>`
 
 
