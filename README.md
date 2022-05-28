@@ -29,6 +29,7 @@ The clips are automatically sent to the CNN for extraction. Once the features ha
 	- aimbot clips should be saved to `hacks_data_tensor`
 	- regular clips should be saved to `no_hacks_data_tensor`
 4. Train RNN using `train_rnn.py`
+5. Model will be saved to `models/model.pt` **Any file with that name will be overwritten**
 
 
 ## Using files outside of pipeline
@@ -47,6 +48,12 @@ To run the CNN by itself, run the following command: `python save_cnn_output.py 
 To run the extracted features through the RNN, run the following command: `python test_rnn.py <.pt path> <clip path>`
 - `<.pt path>` is the path to the .pt file output from the CNN
 - `<clip path>` (Optional, displays timestamps when specified) is the path to clips corresponding to the .pt file are saved
+
+### Train RNN `train_rnn.py`
+To train the RNN, run the following command: `python train_rnn.py`
+
+### ValidateRNN `train_rnn.py`
+To validatethe RNN, run the following command: `python validate_rnn.py`
 
 ## Git repo:
 
