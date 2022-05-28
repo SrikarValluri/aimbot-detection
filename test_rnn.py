@@ -52,7 +52,7 @@ class RNN(nn.Module):
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-model = torch.load("./models/model_max_data.pt")
+model = torch.load("./models/model.pt")
 
 data = torch.load(inFile)
 

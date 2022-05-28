@@ -11,8 +11,8 @@ import sys
 import re
 
 if(len(sys.argv) != 3):
-    framesDir = "./hacks_data_nn"
-    outputDir = "./hacks_data_tensor/no_hacks_data_tensor_file"
+    framesDir = "./no_hacks_data_nn"
+    outputDir = "./no_hacks_data_tensor"
     
 
 else:
@@ -21,6 +21,10 @@ else:
 
 if(not os.path.exists(framesDir)):
     print("Frames directory is invalid.")
+    sys.exit()
+
+if(not os.path.exists(outputDir)):
+    print("Output directory is invalid.")
     sys.exit()
 
 # Device configuration
@@ -34,20 +38,27 @@ allVideos = []
 
 subfolders = [ f for f in os.scandir(framesDir) if f.is_dir() ]
 
+subfolders = sorted(subfolders, key=lambda x: float(re.findall(r'[\d\.]+', x.name)[-1]))
+
+for folder in subfolders:
+    l = len([f for f in os.scandir(folder.path) if f.is_file()] )
+    if l != 60:
+        print(l, folder.name)
+
 with torch.no_grad():
     for folder in subfolders:
-        print(f'Etracting Features from clip at {(folder.name).replace("_", ":")}\t\t\t\n', end='', flush=True)
+        print(f'Extracting Features from clip at {(folder.name).replace("_", ":")}\t\t\t\n', end='', flush=True)
 
-        frames = [ int(re.findall(r'\d+', f.name)[0]) for f in os.scandir(folder.path) if f.is_file() ]
+        frames = [ f for f in os.scandir(folder.path) if f.is_file() ]
 
         assert len(frames) == 60, f'{folder.name} has an incorrect number of frames ({len(frames)})'
 
-        frames.sort()
+        frames = sorted(frames, key=lambda x: int(re.findall(r'\d+', x.name)[0]))
 
         video = []
 
         for frame in frames:
-            image = cv2.imread(os.path.join(folder.path, f'frame{frame}.png'))
+            image = cv2.imread(frame.path)
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             transform = transforms.ToTensor()
             tensor = transform(image)
