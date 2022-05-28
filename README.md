@@ -52,7 +52,7 @@ To run the extracted features through the RNN, run the following command: `pytho
 ### Train RNN `train_rnn.py`
 To train the RNN, run the following command: `python train_rnn.py`
 
-### ValidateRNN `train_rnn.py`
+### Validate RNN `train_rnn.py`
 To validatethe RNN, run the following command: `python validate_rnn.py`
 
 ## Git repo:
