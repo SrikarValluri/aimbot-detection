@@ -54,6 +54,8 @@ assert int(framRate) == 60, "Video must be 60FPS"
 
 print(framRate)
 
+showParse = False
+
 
 # count the number of red lines found in a portion of an image
 # input image must be 3 pixles wide and in BGR format
@@ -110,27 +112,20 @@ while (cap.isOpened()):
         break
 
 
-    # shown to user
-    view = frame.copy()
-    view = cv2.resize(view, (1280, 720), fx = 0, fy = 0, interpolation = cv2.INTER_CUBIC)
-    parseView = view.copy()
     # view = cv2.resize(view, (1280, 720), fx = 0, fy = 0, interpolation = cv2.INTER_CUBIC)
 
     # area of video to analyze must be 3 pixels wide
     # this area is the right edge of the kill feed
-    frame = frame[70:300, 1907:1910]
+    frame_crop = frame[70:300, 1907:1910]
 
 
     # count the number of kill feed edges
-    nlines = countLines(frame)
+    nlines = countLines(frame_crop)
 
     # Display kills to user
     print(f'Kills on Screen: {nlines}, Kills Counted: {len(pois)}\t\t\r', end='', flush=True)
 
-    # view = cv2.putText(view, f'Kills Counted: {len(pois)}', (822, 700), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,255), 1, cv2.LINE_AA)
-    # view = cv2.putText(view, f'Kills Counted: {len(pois)}', (818, 700), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,255), 1, cv2.LINE_AA)
-    view = cv2.putText(view, f'Kills Counted: {len(pois)}', (530, 450), cv2.FONT_HERSHEY_COMPLEX, 0.75, (0,0,255), 1, cv2.LINE_AA)
-    
+   
 
     decCount += 1
 
@@ -147,14 +142,23 @@ while (cap.isOpened()):
     plines = nlines
 
 
-    parseView[parseView[:,:,2] <= 110 ] = [0,0,0]
-    parseView[parseView[:,:,1] >= 20 ] = [0,0,0]
-    parseView[parseView[:,:,0] >= 40 ] = [0,0,0]
+    # shown to user
+    view = cv2.resize(frame, (1280, 720), fx = 0, fy = 0, interpolation = cv2.INTER_CUBIC)
+    # view = cv2.putText(view, f'Kills Counted: {len(pois)}', (822, 700), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,255), 1, cv2.LINE_AA)
+    # view = cv2.putText(view, f'Kills Counted: {len(pois)}', (818, 700), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,255), 1, cv2.LINE_AA)
+    view = cv2.putText(view, f'Kills Counted: {len(pois)}', (530, 450), cv2.FONT_HERSHEY_COMPLEX, 0.75, (0,0,255), 1, cv2.LINE_AA)
+    
+    if showParse:
+        parseView = view.copy()
+        parseView[parseView[:,:,2] <= 110 ] = [0,0,0]
+        parseView[parseView[:,:,1] >= 20 ] = [0,0,0]
+        parseView[parseView[:,:,0] >= 40 ] = [0,0,0]
+        cv2.imshow('Parser Vision', parseView)
 
 
 	# Display the frames to user
     # cv2.imshow('Area or Intrest', frame)
-    cv2.imshow('Parser Vision', parseView)
+    
     cv2.imshow('Normal Gameplay', view)
 
     

@@ -38,7 +38,9 @@ allVideos = []
 
 subfolders = [ f for f in os.scandir(framesDir) if f.is_dir() ]
 
-subfolders = sorted(subfolders, key=lambda x: float(re.findall(r'[\d\.]+', x.name)[-1]))
+# subfolders = sorted(subfolders, key=lambda x: float(re.findall(r'[\d\.]+', x.name)[-1]) + 60 * float(re.findall(r'[\d\.]+', x.name)[-2]))
+
+# print(float(re.findall(r'[\d\.]+', subfolders[0].name)[-1]))
 
 for folder in subfolders:
     l = len([f for f in os.scandir(folder.path) if f.is_file()] )
