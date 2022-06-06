@@ -19,8 +19,6 @@ else:
 if(not os.path.exists(inputDir)):
     print("Input directory is invalid.")
 
-# (from bradley's code) inure outDir ends with /
-inputDir = inputDir + ("/" if inputDir[-1] != "/" else "")
 
 newTensors = []
 for file in os.listdir(inputDir):

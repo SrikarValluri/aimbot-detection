@@ -52,7 +52,7 @@ num_layers = 2
 
 # model = RNN(input_size, hidden_size, num_layers, num_classes).to(device)
 
-model = torch.load("./models/../../model.pt")
+model = torch.load("./models/model.pt")
 
 # Loading the model
 hacks_data = torch.load("./hacks_data_tensor/clips.pt")
