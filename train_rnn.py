@@ -9,15 +9,15 @@ import os
 import cv2
 
 
-
+# Defining LSTM RNN
 class RNN(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, num_classes):
-        super(RNN, self).__init__()
-        self.num_layers = num_layers
-        self.hidden_size = hidden_size
+        super(RNN, self).__init__()     # inheriting from existing RNN class
+        self.num_layers = num_layers    # number of input layers
+        self.hidden_size = hidden_size  # number of hidden players
 
-        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
-        self.fc = nn.Linear(hidden_size, num_classes)
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)  # creating LSTM layer
+        self.fc = nn.Linear(hidden_size, num_classes)                               # creating linear output layer
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -35,7 +35,7 @@ class RNN(nn.Module):
         out = self.fc(out)
 
 
-        return torch.sigmoid(out)
+        return torch.sigmoid(out) # returning one forward step of the NN
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -50,21 +50,21 @@ sequence_length = 50
 hidden_size = 512
 num_layers = 2
 
-model = RNN(input_size, hidden_size, num_layers, num_classes).to(device)
+model = RNN(input_size, hidden_size, num_layers, num_classes).to(device) # Creating instance of LSTM model
 
 # Loss and optimizer
 criterion = nn.BCELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)  
 
 # Loading the model
-hacks_data = torch.load("./hacks_data_tensor/full_data/hacks_data_tensor_file_large.pt")
+hacks_data = torch.load("./hacks_data_tensor/clips.pt")
 hacks_labels = torch.ones(hacks_data.shape[0]).unsqueeze(1)
 
-no_hacks_data = torch.load("./no_hacks_data_tensor/full_data/no_hacks_data_tensor_file_large.pt")
+no_hacks_data = torch.load("./no_hacks_data_tensor/clips.pt")
 no_hacks_labels = torch.zeros(no_hacks_data.shape[0]).unsqueeze(1)
 
 
-# Seperating Training/Testing data
+# Seperating Training/Testing data into 90%/10% splits
 hacks_data_train = hacks_data[:int(len(hacks_data) * 0.9)]
 hacks_data_test = hacks_data[int(len(hacks_data) * 0.9):]
 
@@ -85,25 +85,25 @@ train_labels = torch.cat((hacks_labels_train, no_hacks_labels_train))
 test_data = torch.cat((hacks_data_test, no_hacks_data_test))
 test_labels = torch.cat((hacks_labels_test, no_hacks_labels_test))
 
-model.train()
+model.train() # set model to training mode 
 for epoch in range(num_epochs):
-    images = train_data
-    labels = train_labels
-    labels = labels.to(device)
+    images = train_data         # using our set of images
+    labels = train_labels       # using our set of labels
+    labels = labels.to(device)  # uploading onto CPU/GPU
 
-    random_shuffle = torch.randperm(images.size()[0])
+    random_shuffle = torch.randperm(images.size()[0])  # shuffling the data for every epoch
     images = images[random_shuffle]
     labels = labels[random_shuffle]
     
     # Forward pass
-    outputs = model(images)
-    loss = criterion(outputs, labels)
+    outputs = model(images)     # perform a forward pass 
+    loss = criterion(outputs, labels) # calculate loss/error
     
     # Backward and optimize
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
     
-    print (f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
+    print (f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}') # print results for every epoch
 
-    torch.save(model, "./models/model.pt")
+    torch.save(model, "./models/model.pt") # incrementally save model
